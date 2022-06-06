@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
+use App\Models\UserImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -103,4 +105,38 @@ class ApiController extends Controller
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
+    public function updateProfile(Request $request) {
+
+    }
+
+    public function uploadImage(Request $request) {
+        if ($id_user = $request->id_user and $image = $request->image) {
+            $isAvatar = false;
+            if ($request->is_avatar) {
+                $isAvatar = $request->is_avatar;
+            }
+            $pivot = new UserImage();
+            $images = new Images();
+            $images->image = $image;
+            $images->isAvatar = $isAvatar;
+            $images->save();
+            $pivot->id_user = $id_user;
+            $pivot->id_image = $images->id;
+            $pivot->save();
+            $answer = ['status' => 'success', 'id_image' => $images->id];
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя или не передали картинку'];
+        }
+        return $answer;
+    }
+
+    public function getImagesByUserId(Request $request) {
+        if ($id = $request->id) {
+            $answer = User::find($id)->getImages;
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя'];
+        }
+
+        return response()->json($answer);
+    }
 }

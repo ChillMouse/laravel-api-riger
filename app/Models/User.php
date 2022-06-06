@@ -45,4 +45,8 @@ class User extends Authenticatable
     public function getMessagesFrom() {
         return $this->hasMany(Messages::class, 'id_from_user', 'id');
     }
+
+    public function getImages() {
+        return $this->belongsToMany(Images::class, 'user_images', 'id_user', 'id_image');
+    }
 }

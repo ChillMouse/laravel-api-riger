@@ -20,6 +20,10 @@ Route::post('/auth', [ApiController::class, 'auth']);
 Route::post('/newMessage', [ApiController::class, 'newMessage']);
 Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
 Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
+Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
+Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
+
+Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
