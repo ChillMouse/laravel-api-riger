@@ -5,10 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Messages;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
     public function register(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            'age' => 'required',
+            'sex' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            //$answer = ['status' => 'error', 'text' => 'Не заполнены все поля'];
+        } else {
             $name = $request->input('name');
             $email = $request->input('email');
             $password = $request->input('password');
@@ -22,7 +34,9 @@ class ApiController extends Controller
             $user->age = $age;
             $user->sex = $sex;
             $user->save();
-        return false;
+            $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован'];
+        }
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
     public function auth(Request $request) {
