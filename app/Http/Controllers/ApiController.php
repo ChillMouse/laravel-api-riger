@@ -12,31 +12,44 @@ class ApiController extends Controller
             $name = $request->input('name');
             $email = $request->input('email');
             $password = $request->input('password');
+            $age = $request->input('age');
+            $sex = $request->input('sex');
             $user = new User();
 
             $user->name = $name;
             $user->email = $email;
             $user->password = $password;
+            $user->age = $age;
+            $user->sex = $sex;
             $user->save();
         return false;
     }
 
     public function auth(Request $request) {
-        $login = $request->input('login');
-        $password = $request->input('password');
 
-        $user = User::where([
-                ['email', $login],
-                ['password', $password]
-            ]
-        )->get();
+        if ($login = $request->input('login') and $password = $request->input('password')) {
+            $answer = User::where([
+                    ['email', $login],
+                    ['password', $password]
+                ]
+            )->get();
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
+        }
 
-        return response()->json($user);
+
+
+        return response()->json($answer);
     }
 
-    public function getMessagesFrom($id) {
+    public function getMessagesFrom(Request $request) {
         // Получить сообщения отправленные автору
-        return response()->json(User::find($id)->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        if ($id = $request->input('id') and is_numeric($id)) {
+            $answer = User::find($id)->getMessagesFrom;
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+        }
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
 
 
         // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
@@ -57,4 +70,23 @@ class ApiController extends Controller
 
         return false;
     }
+
+    public function getUsersByParams(Request $request) {
+        $sex = "%";
+        $ageStart = 0;
+        $ageEnd = 100;
+
+        if ($val = $request->input('sex'))
+            $sex = $val;
+
+        if ($val = $request->input('ageEnd'))
+            $ageEnd = $val;
+
+        if ($val = $request->input('ageStart'))
+            $ageStart = $val;
+
+        $answer = User::where('sex', 'like', $sex)->whereBetween('age', [$ageStart, $ageEnd])->get();
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
 }
