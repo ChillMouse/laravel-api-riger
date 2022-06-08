@@ -155,4 +155,17 @@ class ApiController extends Controller
         }
         return response()->json($answer);
     }
+
+    public function getMessagesFromTo(Request $request) {
+        // Получить сообщения отправленные автору
+        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to)) {
+            $answer = User::find($id_from)->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+        }
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+
+
+        // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
 }
