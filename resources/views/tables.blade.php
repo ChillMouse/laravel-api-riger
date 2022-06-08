@@ -24,12 +24,14 @@
     <h1>Пользователи</h1>
     <table>
         <tr>
+            <td>ID</td>
             <td>Имя</td>
             <td>Логин</td>
             <td>Пароль</td>
         </tr>
         @foreach($users as $user)
             <tr>
+                <td>{{ $user->id }}</td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->password }}</td>
@@ -52,6 +54,21 @@
                 <td>{{ $message->text }}</td>
                 <td>{{ $message->created_at }}</td>
                 <td>{{ $message->updated_at }}</td>
+            </tr>
+        @endforeach
+    </table>
+    <h1>Картинки</h1>
+    <table>
+        <tr>
+            <td>ID</td>
+            <td>Картинка</td>
+            <td>Это аватарка?</td>
+        </tr>
+        @foreach($images as $image)
+            <tr>
+                <td>{{ $image->id }}</td>
+                <td>{{ substr(($image->image), 0, 15) . '...' }}</td>
+                <td>{{ $image->isAvatar }}</td>
             </tr>
         @endforeach
     </table>
