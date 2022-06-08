@@ -72,19 +72,26 @@ class ApiController extends Controller
     }
 
     public function newMessage(Request $request) {
-        $idToUser = $request->input('id_to_user');
-        $idFromUser = $request->input('id_from_user');
-        $text = $request->input('text');
+        if (
+            $idToUser = $request->input('id_to_user')
+                and
+            $idFromUser = $request->input('id_from_user')
+                and
+            $text = $request->input('text')
+        ) {
+            $messages = new Messages();
 
-        $messages = new Messages();
+            $messages->text = $text;
+            $messages->id_to_user = $idToUser;
+            $messages->id_from_user = $idFromUser;
 
-        $messages->text = $text;
-        $messages->id_to_user = $idToUser;
-        $messages->id_from_user = $idFromUser;
+            $messages->save();
+            $answer = ['status' => 'success', 'text' => 'Успешно'];
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Не хватает параметров'];
+        }
 
-        $messages->save();
-
-        return false;
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);;
     }
 
     public function getUsersByParams(Request $request) {
@@ -137,6 +144,15 @@ class ApiController extends Controller
             $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя'];
         }
 
+        return response()->json($answer);
+    }
+
+    public function getActualDialogues(Request $request) {
+        if ($id = $request->id) {
+            $answer = User::find($id)->getDialogues->sortByDesc('created_at')->values()->unique('id_from_user');
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя'];
+        }
         return response()->json($answer);
     }
 }
