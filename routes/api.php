@@ -1,6 +1,7 @@
 <?php
 
     use App\Http\Controllers\ApiController;
+    use App\Http\Controllers\MobileController;
     use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,12 @@ Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
 Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
 
 Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
+
+Route::prefix('/mobile')->group(function () {
+    Route::post('/register', [MobileController::class, 'register']);
+    Route::post('/auth', [MobileController::class, 'auth']);
+    Route::post('/getProducts', [MobileController::class, 'getProducts']);
+});
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

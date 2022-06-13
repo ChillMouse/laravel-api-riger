@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class ApiController extends Controller
 {
@@ -44,11 +45,16 @@ class ApiController extends Controller
     public function auth(Request $request) {
 
         if ($login = $request->input('login') and $password = $request->input('password')) {
-            $answer = User::where([
+            $user = User::where([
                     ['email', $login],
                     ['password', $password]
                 ]
             )->get();
+            if (empty($answer)) {
+                $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
+            } else {
+                $answer = $user;
+            }
         } else {
             $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
         }
@@ -60,8 +66,8 @@ class ApiController extends Controller
 
     public function getMessagesFrom(Request $request) {
         // Получить сообщения отправленные автору
-        if ($id = $request->input('id') and is_numeric($id)) {
-            $answer = User::find($id)->getMessagesFrom;
+        if ($id = $request->input('id') and is_numeric($id) and $user = User::find($id)) {
+            $answer = $user->getMessagesFrom;
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
@@ -138,28 +144,34 @@ class ApiController extends Controller
     }
 
     public function getImagesByUserId(Request $request) {
-        if ($id = $request->id) {
-            $answer = User::find($id)->getImages;
+        if ($id = $request->id and $user = User::find($id)) {
+            $answer = $user->getImages;
         } else {
-            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя'];
+            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя или пользователь не найден'];
         }
 
         return response()->json($answer);
     }
 
     public function getActualDialogues(Request $request) {
-        if ($id = $request->id) {
-            $answer = User::find($id)->getDialogues->sortByDesc('created_at')->values()->unique('id_from_user');
+        $success = true;
+        if ($id = $request->id and $user = User::find($id)) {
+            $answer = $user->getDialogues->sortByDesc('created_at')->values()->unique('id_from_user');
         } else {
-            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя'];
+            $success = false;
         }
+
+        if (!$success) {
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
+        }
+
         return response()->json($answer);
     }
 
     public function getMessagesFromTo(Request $request) {
         // Получить сообщения отправленные автору
-        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to)) {
-            $answer = User::find($id_from)->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
+        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to) and $user = User::find($id_from)) {
+            $answer = $user->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
