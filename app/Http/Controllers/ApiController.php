@@ -180,4 +180,27 @@ class ApiController extends Controller
 
         // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
+
+    public function getDialogBetween(Request $request) {
+        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to)) {
+            $messages = new Messages();
+
+            $dialog = $messages->orWhere(function ($query) use ($id_to, $id_from) {
+                $query->where([
+                ['id_from_user', '=', $id_from],
+                ['id_to_user', '=', $id_to]
+                ]);
+            })->orWhere(function($query) use ($id_to, $id_from) {
+                $query->where([
+                    ['id_to_user', '=', $id_from],
+                    ['id_from_user', '=', $id_to]
+                ]);
+            })->get()->sortBy('created_at');
+
+            $answer = $dialog;
+        } else {
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+        }
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
 }

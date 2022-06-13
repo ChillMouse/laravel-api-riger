@@ -25,6 +25,7 @@ Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
 Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
 Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
 Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
+Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
 
 Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 
