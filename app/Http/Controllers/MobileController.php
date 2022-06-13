@@ -42,7 +42,7 @@ class MobileController extends Controller
                     ['password', $password]
                 ]
             )->get();
-            if (empty($answer)) {
+            if (empty($user)) {
                 $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
             } else {
                 $answer = $user;
