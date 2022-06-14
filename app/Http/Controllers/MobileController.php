@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class MobileController extends Controller
 {
@@ -35,6 +36,8 @@ class MobileController extends Controller
     }
 
     public function auth(Request $request) {
+        $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
+        $user = [];
 
         if ($login = $request->input('login') and $password = $request->input('password')) {
             $user = User::where([
@@ -42,14 +45,12 @@ class MobileController extends Controller
                     ['password', $password]
                 ]
             )->get();
-            if (empty($user)) {
+            $answer = $user;
+            if ($user->count() == 0) {
                 $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
-            } else {
-                $answer = $user;
             }
-        } else {
-            $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
         }
+
         return response()->json($answer);
     }
 }

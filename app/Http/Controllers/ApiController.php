@@ -43,6 +43,8 @@ class ApiController extends Controller
     }
 
     public function auth(Request $request) {
+        $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
+        $user = [];
 
         if ($login = $request->input('login') and $password = $request->input('password')) {
             $user = User::where([
@@ -51,14 +53,10 @@ class ApiController extends Controller
                 ]
             )->get();
             $answer = $user;
-            if (empty($user)) {
+            if ($user->count() == 0) {
                 $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
             }
-        } else {
-            $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
         }
-
-
 
         return response()->json($answer);
     }
