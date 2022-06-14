@@ -50,10 +50,9 @@ class ApiController extends Controller
                     ['password', $password]
                 ]
             )->get();
-            if (empty($answer)) {
+            $answer = $user;
+            if (empty($user)) {
                 $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
-            } else {
-                $answer = $user;
             }
         } else {
             $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
