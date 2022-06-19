@@ -26,7 +26,7 @@ class MobileController extends Controller
             $validatelen = Validator::make($input, $rules);
 
             if ($validate->passes() and $validatelen->passes()) {
-                $user = MobileUser::on('mysql_etmobile')->newModelInstance();
+                $user = new MobileUser();
 
                 $user->login = $login;
                 $user->password = $password;
