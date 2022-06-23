@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\MobileUser;
+use App\Models\Products;
 use App\Models\Tokens;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use function React\Promise\map;
 
 class MobileController extends Controller
 {
@@ -122,5 +124,38 @@ class MobileController extends Controller
         }
 
         return response()->json($answer);
+    }
+
+    public function getProducts(Request $request) {
+        $oauth = true;
+        $answer = null;
+        if ($request->client_id != '~(!?:2J`;x%5)Nw>') {
+            $answer = [
+                'status' => 'error',
+                'text' => 'OAuth error'
+            ];
+            $oauth = false;
+        }
+        if ($oauth) {
+            $products = Products::all();
+            $count = $products->count();
+            $products = $products->map(function($v) {
+                    $v->image = base64_encode($v->image);
+                    return $v;
+                });
+            if ($count > 0) {
+                $answer = [
+                    'status' => 'success',
+                    'results' => $products
+                ];
+            } else {
+                $answer = [
+                    'status' => 'error',
+                    'text' => 'Товаров нет'
+                ];
+            }
+        }
+
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 }

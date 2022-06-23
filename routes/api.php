@@ -32,8 +32,8 @@ Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 Route::prefix('/mobile')->group(function () {
     Route::post('/register', [MobileController::class, 'register']);
     Route::post('/auth', [MobileController::class, 'auth']);
-    Route::post('/getProducts', [MobileController::class, 'getProducts']);
     Route::post('/token', [MobileController::class, 'token']);
+    Route::get('/getProducts', [MobileController::class, 'getProducts']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
