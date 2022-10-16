@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointments;
 use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
@@ -14,5 +15,10 @@ class FeedController extends Controller
         $messages = Messages::all();
         $images = Images::all();
         return view('tables', compact('users', 'messages', 'images'));
+    }
+
+    public function indexDoctors() {
+        $appointments = Appointments::all()->toArray();
+        return view('table_doctor', compact('appointments'));
     }
 }
