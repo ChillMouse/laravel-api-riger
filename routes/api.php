@@ -29,6 +29,9 @@ Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
 
 Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 
+Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
+Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
+
 Route::prefix('/mobile')->group(function () {
     Route::post('/register', [MobileController::class, 'register']);
     Route::post('/auth', [MobileController::class, 'auth']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointments;
 use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
@@ -198,6 +199,61 @@ class ApiController extends Controller
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
+    public function registerToDoctor(Request $request) {
+        $messages = [
+            'telephone.required' => 'Номер телефона не указан',
+            'client_firstname.required' => 'Имя клиента не указано',
+            'client_lastname.required' => 'Фамилия клиента не указана',
+            'doctor_firstname.required' => 'Имя доктора не указано',
+            'doctor_lastname.required' => 'Фамилия доктора не указана',
+            'appointment_time.required' => 'Дата приёма не указана',
+            'telephone.max' => 'Длина телефона превышена',
+            'client_firstname.max' => 'Длина имени клиента превышена',
+            'client_lastname.max' => 'Длина фамилии клиента превышена',
+            'doctor_firstname.max' => 'Длина имени доктора превышена',
+            'doctor_lastname.max' => 'Длина фамилии доктора превышена',
+            ];
+        $rules = [
+            'telephone' => 'required|max:20',
+            'client_firstname' => 'required|max:20',
+            'client_lastname' => 'required|max:20',
+            'doctor_firstname' => 'required|max:20',
+            'doctor_lastname' => 'required|max:20',
+            'appointment_time' => 'required'
+        ];
+
+        $validated = Validator::make($request->all(), $rules, $messages);
+
+        $validate_failed = $validated->fails();
+
+        if ($validate_failed) {
+            $answer = ['status' => 'error', 'errors' => $validated->errors()->all()];
+        } else {
+            $appointment = Appointments::create($request->all());
+            $answer = ['status' => 'success', 'text' => 'Успешно добавлена запись'];
+        }
+
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getRegisterToDoctor(Request $request) {
+        $appointment = new Appointments;
+        if ($telephone = $request->telephone) {
+            $appointment = Appointments::where(['telephone' => $telephone])->get();
+
+            if ($appointment->count() > 0) {
+                $answer = ['status' => 'success', 'result' => $appointment];
+            } else {
+                $answer = ['status' => 'error', 'text' => "Пользователя с таким номером не найдено"];
+            }
+
+        } else {
+            $answer = ['status' => 'success', 'result' => $appointment->all()];
+        }
+
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 }
