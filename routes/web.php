@@ -15,3 +15,4 @@
 */
 
 Route::get('/', [FeedController::class, 'index']);
+Route::get('/doctors', [FeedController::class, 'indexDoctors']);
