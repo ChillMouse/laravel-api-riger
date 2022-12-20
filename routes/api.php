@@ -32,13 +32,12 @@ Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
 Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
 
+Route::post('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
+Route::post('/storeImage', [ApiController::class, 'storeImage']);
+
 Route::prefix('/mobile')->group(function () {
     Route::post('/register', [MobileController::class, 'register']);
     Route::post('/auth', [MobileController::class, 'auth']);
     Route::post('/token', [MobileController::class, 'token']);
     Route::get('/getProducts', [MobileController::class, 'getProducts']);
-});
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
 });

@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'city',
+        'sex',
+        'age',
+        'image_path',
     ];
 
     /**
@@ -41,6 +45,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $connection = 'mysql';
 
     public function getMessagesFrom() {
         return $this->hasMany(Messages::class, 'id_from_user', 'id');

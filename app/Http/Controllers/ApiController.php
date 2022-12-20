@@ -7,8 +7,10 @@ use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
 use App\Models\UserImage;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use function PHPUnit\Framework\isEmpty;
 
 class ApiController extends Controller
@@ -20,6 +22,7 @@ class ApiController extends Controller
             'password' => 'required',
             'age' => 'required',
             'sex' => 'required',
+            'city' => 'required',
         ]);
         if ($validator->fails()) {
             $answer = $validator->errors();
@@ -30,6 +33,7 @@ class ApiController extends Controller
             $password = $request->input('password');
             $age = $request->input('age');
             $sex = $request->input('sex');
+            $city = $request->input('city');
             $user = new User();
 
             $user->name = $name;
@@ -37,6 +41,7 @@ class ApiController extends Controller
             $user->password = $password;
             $user->age = $age;
             $user->sex = $sex;
+            $user->city = $city;
             $user->save();
             $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован'];
         }
@@ -100,6 +105,7 @@ class ApiController extends Controller
 
     public function getUsersByParams(Request $request) {
         $sex = "%";
+        $city = "%";
         $ageStart = 0;
         $ageEnd = 100;
 
@@ -112,12 +118,31 @@ class ApiController extends Controller
         if ($val = $request->input('ageStart'))
             $ageStart = $val;
 
-        $answer = User::where('sex', 'like', $sex)->whereBetween('age', [$ageStart, $ageEnd])->get();
+        if ($val = $request->input('ageStart'))
+            $city = $val;
+
+        $answer = User::where('sex', 'like', $sex)->where('city', 'like', $city)->whereBetween('age', [$ageStart, $ageEnd])->get();
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
     public function updateProfile(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
+            //$answer = ['status' => 'error', 'text' => 'Не заполнены все поля'];
+        } else {
+            $id = $request->input('id');
+
+            $user = User::find($id);
+            $user->fill($request->all())->save();
+            $answer = ['status' => 'success', 'text' => 'Пользователь обновлён'];
+        }
+
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
     public function uploadImage(Request $request) {
@@ -254,6 +279,71 @@ class ApiController extends Controller
             $answer = ['status' => 'success', 'result' => $appointment->all()];
         }
 
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getUsersByPage(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'count' => 'required|integer',
+            'page' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
+            //$answer = ['status' => 'error', 'text' => 'Не заполнены все поля'];
+        } else {
+            $count = $request->input('count');
+            $page = $request->input('page');
+
+            $users = ['Пустой массив'];
+
+            $count = intval($count);
+            $page = intval($page);
+            $users = User::skip($count * $page)->take($count)->get();
+
+            $answer = ['status' => 'success', 'text' => 'Успешно', 'result' => $users];
+
+
+        }
+
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
+    public function storeImage(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+            'image' => 'required|file',
+        ]);
+
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
+        }
+
+        if (!$validator->fails()) {
+            $id = $request->id;
+            $destination_path = 'public/images/avatars';
+            $image = $request->file('image');
+            $image_name = Str::random(32);
+            $ext = $image->extension();
+            $allowExt = ['jpg', 'jpeg', 'png', 'bmp', 'webp', 'gif'];
+            if (in_array($ext, $allowExt) ) {
+                $path = $image->storeAs($destination_path, "$image_name.$ext");
+                $answer = ['status' => 'success', 'link' => "http://api.cg10280.tmweb.ru/storage/images/avatars/$image_name.$ext"];
+                $user = User::find($id);
+                if (!empty($user)) {
+                    $user->fill(['image_path' => "$path"])->save();
+                } else {
+                    $answer = ['status' => 'error', 'text' => "Пользователь не найден"];
+                }
+            } else {
+                $answer = ['status' => 'error', 'text' => "Расширение не файла картинки"];
+            }
+
+            //http://localhost:8000/storage/images/avatars/ZIMAzz2F0Jmf3DHbHaHbbcRV0X6vKU9x.png
+
+        }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 }
