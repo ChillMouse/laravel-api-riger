@@ -29,6 +29,9 @@
             <td>Логин</td>
             <td>Пароль</td>
             <td>Город</td>
+            <td>Возраст</td>
+            <td>Пол</td>
+            <td>Путь до картинки</td>
         </tr>
         @foreach($users as $user)
             <tr>
@@ -37,6 +40,9 @@
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->password }}</td>
                 <td>{{ $user->city }}</td>
+                <td>{{ $user->age }}</td>
+                <td>{{ $user->sex }}</td>
+                <td>{{ $user->image_path }}</td>
             </tr>
         @endforeach
     </table>
