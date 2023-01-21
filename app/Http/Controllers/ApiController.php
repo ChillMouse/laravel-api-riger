@@ -118,10 +118,16 @@ class ApiController extends Controller
         if ($val = $request->input('ageStart'))
             $ageStart = $val;
 
-        if ($val = $request->input('ageStart'))
+        if ($val = $request->input('city'))
             $city = $val;
 
-        $answer = User::where('sex', 'like', $sex)->where('city', 'like', $city)->whereBetween('age', [$ageStart, $ageEnd])->get();
+
+        $conditions = [
+            ['sex', 'like', $sex],
+            ['city', 'like', $city]
+        ];
+
+        $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->get();
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
