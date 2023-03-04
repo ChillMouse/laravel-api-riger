@@ -22,46 +22,34 @@
     </head>
     <body class="antialiased">
     <h1>Пользователи</h1>
-    <table>
+    <table style="border: 1px solid black;" border="1">
         <tr>
-            <td>ID</td>
-            <td>Имя</td>
-            <td>Логин</td>
-            <td>Пароль</td>
-            <td>Город</td>
-            <td>Возраст</td>
-            <td>Пол</td>
-            <td>Путь до картинки</td>
+{{--            {{ collect($users->first())->keys() }}--}}
+        @foreach(collect($users->first())->keys() as $key)
+               <td>{{ $key }}</td>
+        @endforeach
         </tr>
         @foreach($users as $user)
             <tr>
-                <td>{{ $user->id }}</td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->password }}</td>
-                <td>{{ $user->city }}</td>
-                <td>{{ $user->age }}</td>
-                <td>{{ $user->sex }}</td>
-                <td>{{ $user->image_path }}</td>
+                @foreach(collect($user)->values() as $value)
+                    <td>{{ $value }}</td>
+                @endforeach
             </tr>
         @endforeach
     </table>
     <h1>Сообщения</h1>
-    <table>
+    <table border="">
         <tr>
-            <td>ID отправителя</td>
-            <td>ID получателя</td>
-            <td>Сообщение</td>
-            <td>Дата создания</td>
-            <td>Дата обновления</td>
+            {{--            {{ collect($users->first())->keys() }}--}}
+            @foreach(collect($messages->first())->keys() as $key)
+                <td>{{ $key }}</td>
+            @endforeach
         </tr>
         @foreach($messages as $message)
             <tr>
-                <td>{{ $message->id_from_user }}</td>
-                <td>{{ $message->id_to_user }}</td>
-                <td>{{ $message->text }}</td>
-                <td>{{ $message->created_at }}</td>
-                <td>{{ $message->updated_at }}</td>
+                @foreach(collect($message)->values() as $value)
+                    <td>{{ $value }}</td>
+                @endforeach
             </tr>
         @endforeach
     </table>
