@@ -16,9 +16,23 @@ class AuthByHeaders
      */
     public function handle(Request $request, Closure $next)
     {
+
         if ($request->bearerToken() != env('BEARER_TOKEN')) {
             return redirect('api/error_auth');
         }
+
+        if ($request->header('Host') != 'api.uzkanova.ru') {
+            return redirect('api/error_auth');
+        }
+
+        if ($request->header('Referer') != 'api.uzkanova.ru/api') {
+            return redirect('api/error_auth');
+        }
+
+        if ($request->header('Accept') != 'application/json') {
+            return redirect('api/error_auth');
+        }
+
         return $next($request);
     }
 }
