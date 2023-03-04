@@ -16,7 +16,9 @@ class AuthByHeaders
      */
     public function handle(Request $request, Closure $next)
     {
-        echo $request->header('User-Agent');
+        if ($request->bearerToken() != env('BEARER_TOKEN')) {
+            return redirect('api/error_auth');
+        }
         return $next($request);
     }
 }

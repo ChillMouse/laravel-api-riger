@@ -15,6 +15,14 @@ use function PHPUnit\Framework\isEmpty;
 
 class ApiController extends Controller
 {
+    public function errorAuth(Request $request) {
+        $answer = [
+            'status' => 'error',
+            'reason' => 'error auth'
+        ];
+        return response()->json($answer, '403', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
