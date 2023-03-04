@@ -16,24 +16,29 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', [ApiController::class, 'register']);
-Route::post('/auth', [ApiController::class, 'auth']);
-Route::post('/newMessage', [ApiController::class, 'newMessage']);
-Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
-Route::get('/getMessagesFromTo', [ApiController::class, 'getMessagesFromTo']);
-Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
-Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
-Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
-Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
-Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
+Route::prefix('/')
+    ->middleware('auth_headers')
+    ->group(function () {
+        Route::post('/register', [ApiController::class, 'register']);
+        Route::post('/auth', [ApiController::class, 'auth']);
+        Route::post('/newMessage', [ApiController::class, 'newMessage']);
+        Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
+        Route::get('/getMessagesFromTo', [ApiController::class, 'getMessagesFromTo']);
+        Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
+        Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
+        Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
+        Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
+        Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
 
-Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
+        Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
 
-Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
-Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
+        Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
+        Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
 
-Route::post('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
-Route::post('/storeImage', [ApiController::class, 'storeImage']);
+        Route::post('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
+        Route::post('/storeImage', [ApiController::class, 'storeImage']);
+    });
+
 
 Route::prefix('/mobile')->group(function () {
     Route::post('/register', [MobileController::class, 'register']);
