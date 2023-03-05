@@ -2,12 +2,13 @@
 namespace App\Helpers;
 
 use App\Models\LogReq;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AppHelper
 {
-    public function logWrite(Request $request, Response $response): void {
+    public function logWrite(Request $request, Response | JsonResponse $response): void {
         $logreq = new LogReq();
         $logreq->url = $request->url();
         $params = $request->all();
