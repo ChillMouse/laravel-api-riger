@@ -25,10 +25,6 @@ class AuthByHeaders
             return redirect('api/error_auth');
         }
 
-//        if ($request->header('Referer') != 'api.uzkanova.ru/api') {
-//            return redirect('api/error_auth');
-//        }
-
         if ($request->header('Accept') != 'application/json') {
             return redirect('api/error_auth');
         }
