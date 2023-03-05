@@ -32,8 +32,6 @@ class AuthByHeaders
 
         $response = $next($request);
 
-        AppHelper::instance()->logWrite($request, $response);
-
         return $response;
     }
 }

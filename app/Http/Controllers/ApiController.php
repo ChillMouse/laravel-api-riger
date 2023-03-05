@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Models\Appointments;
 use App\Models\Images;
 use App\Models\Messages;
@@ -20,7 +21,11 @@ class ApiController extends Controller
             'status' => 'error',
             'reason' => 'error auth'
         ];
-        return response()->json($answer, '403', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        $response = response()->json($answer, '403', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+
+        AppHelper::instance()->logWrite($request, $response);
+
+        return $response;
     }
 
     public function register(Request $request) {
