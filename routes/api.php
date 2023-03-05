@@ -20,7 +20,6 @@ Route::group(
     [
         'middleware' => [
             'auth_headers',
-            'logging_requests',
         ]
     ], function () {
         Route::post('/register', [ApiController::class, 'register']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AppHelper;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,10 @@ class AuthByHeaders
             return redirect('api/error_auth');
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        AppHelper::instance()->logWrite($request, $response);
+
+        return $response;
     }
 }
