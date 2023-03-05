@@ -16,9 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::any('/error_auth', [ApiController::class, 'errorAuth']);
-Route::middleware('auth_headers')
-    ->middleware('logging_requests')
-    ->group(function () {
+Route::group(
+    ['middleware'=>['auth_headers', 'logging_requests']], function () {
         Route::post('/register', [ApiController::class, 'register']);
         Route::post('/auth', [ApiController::class, 'auth']);
         Route::post('/newMessage', [ApiController::class, 'newMessage']);
