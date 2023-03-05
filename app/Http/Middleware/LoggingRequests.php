@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\LogReq;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,9 @@ class LoggingRequests
      */
     public function handle(Request $request, Closure $next)
     {
+        $logreq = new LogReq();
+        $logreq->url = $request->url();
+        $logreq->save();
         return $next($request);
     }
 }
