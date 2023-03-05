@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\AppHelper;
+use App\Http\Controllers\ApiController;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class AuthByHeaders
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     private function redirectToError(Request $request) {
-        return redirect()->action('ApiController@errorAuth', [$request]);
+        return redirect()->action([ApiController::class, 'errorAuth'], [$request]);
     }
 
     public function handle(Request $request, Closure $next)
