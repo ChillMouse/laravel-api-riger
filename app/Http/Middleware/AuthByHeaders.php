@@ -15,19 +15,18 @@ class AuthByHeaders
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
+    private function redirectToError(Request $request) {
+        return redirect('api/error_auth', [$request]);
+    }
+
     public function handle(Request $request, Closure $next)
     {
 
-        if ($request->bearerToken() != env('BEARER_TOKEN')) {
-            return redirect('api/error_auth');
-        }
-
-        if ($request->header('Host') != 'api.uzkanova.ru') {
-            return redirect('api/error_auth');
-        }
-
-        if ($request->header('Accept') != 'application/json') {
-            return redirect('api/error_auth');
+        if ($request->bearerToken() != env('BEARER_TOKEN') or
+            $request->header('Host') != 'api.uzkanova.ru' or
+            $request->header('Accept') != 'application/json'
+        ) {
+            return $this->redirectToError($request);
         }
 
         $response = $next($request);
