@@ -16,7 +16,7 @@ class AuthByHeaders
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     private function redirectToError(Request $request) {
-        return redirect('api/error_auth', [$request]);
+        return redirect()->action('api/error_auth', [$request]);
     }
 
     public function handle(Request $request, Closure $next)
