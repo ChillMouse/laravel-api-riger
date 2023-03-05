@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AppHelper;
 use App\Models\LogReq;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,22 +18,10 @@ class LoggingRequests
      */
     public function handle(Request $request, Closure $next)
     {
-        $logreq = new LogReq();
-        $logreq->url = $request->url();
-        $params = $request->all();
-        $logreq->params = json_encode($params);
-
-        $headers = collect($request->header())->transform(function ($item) {
-            return $item[0];
-        });
-
-        $logreq->headers = json_encode($headers);
 
         $response = $next($request);
 
-        $logreq->response = json_encode($response);
-
-        $logreq->save();
+        AppHelper::instance()->logWrite($request, $response);
 
         return $response;
     }
