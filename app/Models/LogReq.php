@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class LogReq extends Model
 {
     use HasFactory;
+    protected $table = 'logging_requests';
 }
