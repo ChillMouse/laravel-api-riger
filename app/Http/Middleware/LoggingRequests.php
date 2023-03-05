@@ -21,6 +21,13 @@ class LoggingRequests
         $logreq->url = $request->url();
         $params = $request->all();
         $logreq->params = json_encode($params);
+
+        $headers = collect($request->header())->transform(function ($item) {
+            return $item[0];
+        });
+
+        $logreq->headers = json_encode($headers);
+
         $logreq->save();
         return $next($request);
     }
