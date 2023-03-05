@@ -19,7 +19,8 @@ class LoggingRequests
     {
         $logreq = new LogReq();
         $logreq->url = $request->url();
-        $logreq->params = $request->all();
+        $params = collect($request->all());
+        $logreq->params = implode(" ", $params);
         $logreq->save();
         return $next($request);
     }
