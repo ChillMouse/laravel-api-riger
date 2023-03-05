@@ -28,7 +28,13 @@ class LoggingRequests
 
         $logreq->headers = json_encode($headers);
 
+
+        $response = $next($request);
+
+        $logreq->response = json_encode($response);
+
         $logreq->save();
-        return $next($request);
+
+        return $response;
     }
 }
