@@ -8,11 +8,10 @@ use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
 use App\Models\UserImage;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use function PHPUnit\Framework\isEmpty;
+use function Sodium\add;
 
 class ApiController extends Controller
 {
@@ -47,6 +46,7 @@ class ApiController extends Controller
             $age = $request->input('age');
             $sex = $request->input('sex');
             $city = $request->input('city');
+            $hash = AppHelper::instance()->getHash($password);
             $user = new User();
 
             $user->name = $name;
@@ -55,6 +55,7 @@ class ApiController extends Controller
             $user->age = $age;
             $user->sex = $sex;
             $user->city = $city;
+            $user->hash = $hash;
             $user->save();
             $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован'];
         }
@@ -185,9 +186,15 @@ class ApiController extends Controller
         return $answer;
     }
 
-    public function getImagesByUserId(Request $request) {
-        if ($id = $request->id and $user = User::find($id)) {
-            $answer = $user->getImages;
+    public function getImagesByUserHash(Request $request) {
+        if ($hash = $request->hash and $user = User::where([['hash', '=', $hash]])->get()) {
+            try {
+                $id_user = $user->first()->id;
+                $images = User::find($id_user)->getImages;
+                $answer = $images;
+            } catch (\Exception $e) {
+                $answer = ['status' => 'error', 'text' => 'Внутренняя ошибка'];
+            }
         } else {
             $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя или пользователь не найден'];
         }
@@ -329,6 +336,30 @@ class ApiController extends Controller
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
+    public function getUserById(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
+        } else {
+            $id_user = $request->input('id');
+
+            $user = ['Пустой массив'];
+
+            $id_user = intval($id_user);
+            $user = User::find($id_user)->getImages();
+
+            $answer = ['status' => 'success', 'text' => 'Успешно', 'result' => $user];
+
+
+        }
+
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+    }
+
     public function storeImage(Request $request) {
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
@@ -352,12 +383,12 @@ class ApiController extends Controller
                 $path = $image->storeAs($destination_path, "$image_name.$ext");
                 $http_address = env('APP_URL');
                 $answer = ['status' => 'success', 'link' => "$http_address" . "storage/images/avatars/$image_name.$ext"];
-                $user = User::find($id);
-                if (!empty($user)) {
-                    $user->fill(['image_path' => "$path"])->save();
-                } else {
-                    $answer = ['status' => 'error', 'text' => "Пользователь не найден"];
-                }
+                $image = new Images();
+
+                $fullpath = "$http_address" . "storage/images/avatars/$image_name.$ext";
+
+                $image->fill(['image_path' => "$fullpath", 'user_id' => $id])->save();
+
             } else {
                 $answer = ['status' => 'error', 'text' => "Расширение не файла картинки"];
             }

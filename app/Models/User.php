@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -57,6 +58,6 @@ class User extends Authenticatable
     }
 
     public function getImages() {
-        return $this->belongsToMany(Images::class, 'user_images', 'id_user', 'id_image');
+        return $this->hasMany(Images::class, 'user_id', 'id');
     }
 }

@@ -29,8 +29,9 @@ Route::group(
         Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
         Route::get('/getMessagesFromTo', [ApiController::class, 'getMessagesFromTo']);
         Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
+        Route::get('/getUserById', [ApiController::class, 'getUserById']);
         Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
-        Route::get('/getImagesByUserId', [ApiController::class, 'getImagesByUserId']);
+        Route::post('/getImagesByUserHash', [ApiController::class, 'getImagesByUserHash']);
         Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
         Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
 
