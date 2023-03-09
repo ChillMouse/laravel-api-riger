@@ -350,7 +350,7 @@ class ApiController extends Controller
             if (in_array($ext, $allowExt) ) {
                 $path = $image->storeAs($destination_path, "$image_name.$ext");
                 $http_address = env('APP_URL');
-                $answer = ['status' => 'success', 'link' => "$http_address/storage/images/avatars/$image_name.$ext"];
+                $answer = ['status' => 'success', 'link' => "$http_address" . "storage/images/avatars/$image_name.$ext"];
                 $user = User::find($id);
                 if (!empty($user)) {
                     $user->fill(['image_path' => "$path"])->save();
