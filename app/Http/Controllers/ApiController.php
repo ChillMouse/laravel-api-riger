@@ -333,6 +333,7 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
             'image' => 'required|file',
+            'is_avatar' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -342,7 +343,7 @@ class ApiController extends Controller
 
         if (!$validator->fails()) {
             $id = $request->id;
-            $destination_path = 'storage/images/avatars';
+            $destination_path = 'public/images/avatars';
             $image = $request->file('image');
             $image_name = Str::random(32);
             $ext = $image->extension();
