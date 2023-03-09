@@ -342,7 +342,7 @@ class ApiController extends Controller
 
         if (!$validator->fails()) {
             $id = $request->id;
-            $destination_path = 'public/images/avatars';
+            $destination_path = 'storage/images/avatars';
             $image = $request->file('image');
             $image_name = Str::random(32);
             $ext = $image->extension();
