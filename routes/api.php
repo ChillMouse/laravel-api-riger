@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::any('/error_auth', [ApiController::class, 'errorAuth']);
+
 Route::group(
     [
         'middleware' => [
@@ -25,6 +26,15 @@ Route::group(
     ], function () {
         Route::post('/register', [ApiController::class, 'register']);
         Route::post('/auth', [ApiController::class, 'auth']);
+    });
+
+Route::group(
+    [
+        'middleware' => [
+            'jwt.verify',
+            'logging_requests',
+        ]
+    ], function () {
         Route::post('/newMessage', [ApiController::class, 'newMessage']);
         Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
         Route::get('/getMessagesFromTo', [ApiController::class, 'getMessagesFromTo']);
@@ -43,11 +53,3 @@ Route::group(
         Route::post('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
         Route::post('/storeImage', [ApiController::class, 'storeImage']);
     });
-
-
-Route::prefix('/mobile')->group(function () {
-    Route::post('/register', [MobileController::class, 'register']);
-    Route::post('/auth', [MobileController::class, 'auth']);
-    Route::post('/token', [MobileController::class, 'token']);
-    Route::get('/getProducts', [MobileController::class, 'getProducts']);
-});

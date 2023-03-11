@@ -165,6 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -174,6 +175,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
 
     ],
 
@@ -229,6 +231,8 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
 
     ],
 
