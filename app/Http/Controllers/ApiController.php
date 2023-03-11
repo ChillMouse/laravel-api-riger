@@ -35,12 +35,13 @@ class ApiController extends Controller
             'message' => $message
         ];
 
-        return response()->json($response, $status);
+        return response()->json($response, $status, ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function sendError($errorData, $message, $status = 500)
     {
         $response = [];
+        $response['status'] = 'error';
         $response['message'] = $message;
         if (!empty($errorData)) {
             $response['data'] = $errorData;
@@ -51,7 +52,7 @@ class ApiController extends Controller
 
     public function register(Request $request) {
 
-        $input = $request->only('name', 'email', 'password', 'age', 'sex', 'city', 'hash');
+        $input = $request->only('name', 'email', 'password', 'age', 'sex', 'city');
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -67,35 +68,22 @@ class ApiController extends Controller
         }
         $password = $input['password'];
 
-        $input['hash'] = AppHelper::instance()->getHash($password);
-
         $input['password'] = bcrypt($password);
 
         $user = User::create($input);
 
-        $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован', 'user' => $user];
+        $email = $input['email'];
 
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        $token = JWTAuth::attempt(['email' => $email, 'password' => $password]);
+
+        $success = [
+            'token' => $token,
+        ];
+
+        return $this->sendResponse($success, 'successful registration', 200);
     }
 
     public function auth(Request $request) {
-
-//        $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
-//        $user = [];
-//
-//        if ($login = $request->input('login') and $password = $request->input('password')) {
-//            $user = User::where([
-//                    ['email', $login],
-//                    ['password', $password]
-//                ]
-//            )->get();
-//            $answer = $user;
-//            if ($user->count() == 0) {
-//                $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
-//            }
-//        }
-//        return response()->json($answer);
-
         $input = $request->only('email', 'password');
 
         $validator = Validator::make($input, [
@@ -228,11 +216,10 @@ class ApiController extends Controller
         return $answer;
     }
 
-    public function getImagesByUserHash(Request $request) {
-        if ($hash = $request->hash and $user = User::where([['hash', '=', $hash]])->get()) {
+    public function getImagesByUserUuid(Request $request) {
+        if ($id = $request->id and $user = User::find($id)) {
             try {
-                $id_user = $user->first()->id;
-                $images = User::find($id_user)->getImages;
+                $images = $user->getImages;
                 $answer = $images;
             } catch (\Exception $e) {
                 $answer = ['status' => 'error', 'text' => 'Внутренняя ошибка'];
@@ -368,7 +355,16 @@ class ApiController extends Controller
 
             $count = intval($count);
             $page = intval($page);
-            $users = User::skip($count * $page)->take($count)->get();
+
+            $token = JWTAuth::getToken();
+            $apy = JWTAuth::getPayload($token)->toArray();
+            $id = $apy['sub'];
+
+            $users = User::skip($count * $page)->take($count)->where('id', '!=', $id)->get();
+
+            $users->load('images'); // Load relationship in collection
+
+            // $users = $users->except([$id]); // Except self-user
 
             $answer = ['status' => 'success', 'text' => 'Успешно', 'result' => $users];
 
@@ -380,7 +376,7 @@ class ApiController extends Controller
 
     public function getUserById(Request $request) {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|integer',
+            'id' => 'required|uuid',
         ]);
 
         if ($validator->fails()) {
@@ -404,7 +400,6 @@ class ApiController extends Controller
 
     public function storeImage(Request $request) {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|integer',
             'image' => 'required|file',
             'is_avatar' => 'required|integer'
         ]);
@@ -415,10 +410,12 @@ class ApiController extends Controller
         }
 
         if (!$validator->fails()) {
-            $id = $request->id;
+            $token = JWTAuth::getToken();
+            $apy = JWTAuth::getPayload($token)->toArray();
+            $id = $apy['sub'];
             $destination_path = 'public/images/avatars';
             $image = $request->file('image');
-            $image_name = Str::random(32);
+            $image_name = uniqid('img_');
             $ext = $image->extension();
             $allowExt = ['jpg', 'jpeg', 'png', 'bmp', 'webp', 'gif'];
             if (in_array($ext, $allowExt) ) {

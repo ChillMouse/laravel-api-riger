@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +14,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
-
+    use HasUuids;
     /**
      * The attributes that are mass assignable.
      *
@@ -68,7 +69,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Messages::class, 'id_to_user', 'id');
     }
 
-    public function getImages() {
+    public function images() {
         return $this->hasMany(Images::class, 'user_id', 'id');
     }
 }

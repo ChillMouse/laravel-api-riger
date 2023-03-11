@@ -22,6 +22,9 @@ class AuthByHeaders
 
     public function handle(Request $request, Closure $next)
     {
+        if (! $request->hasHeader('Authorization')) {
+            return $this->redirectToError($request);
+        }
 
         if ($request->bearerToken() != env('BEARER_TOKEN') or
             $request->header('Host') != 'api.uzkanova.ru' or

@@ -26,6 +26,8 @@ Route::group(
     ], function () {
         Route::post('/register', [ApiController::class, 'register']);
         Route::post('/auth', [ApiController::class, 'auth']);
+        Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
+        Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
     });
 
 Route::group(
@@ -41,15 +43,10 @@ Route::group(
         Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
         Route::get('/getUserById', [ApiController::class, 'getUserById']);
         Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
-        Route::post('/getImagesByUserHash', [ApiController::class, 'getImagesByUserHash']);
         Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
         Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
-
         Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
-
-        Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
-        Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
-
-        Route::post('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
+        Route::get('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
         Route::post('/storeImage', [ApiController::class, 'storeImage']);
-    });
+        Route::get('/getImagesByUserUuid', [ApiController::class, 'getImagesByUserUuid']);
+});
