@@ -11,7 +11,8 @@ use App\Models\UserImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use function Sodium\add;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ApiController extends Controller
 {
@@ -27,7 +28,31 @@ class ApiController extends Controller
         return $response;
     }
 
+    public function sendResponse($data, $message, $status = 200)
+    {
+        $response = [
+            'data' => $data,
+            'message' => $message
+        ];
+
+        return response()->json($response, $status);
+    }
+
+    public function sendError($errorData, $message, $status = 500)
+    {
+        $response = [];
+        $response['message'] = $message;
+        if (!empty($errorData)) {
+            $response['data'] = $errorData;
+        }
+
+        return response()->json($response, $status);
+    }
+
     public function register(Request $request) {
+
+        $input = $request->only('name', 'email', 'password', 'age', 'sex', 'city', 'hash');
+
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|unique:users,email',
@@ -36,49 +61,66 @@ class ApiController extends Controller
             'sex' => 'required',
             'city' => 'required',
         ]);
-        if ($validator->fails()) {
-            $answer = $validator->errors();
-            //$answer = ['status' => 'error', 'text' => 'Не заполнены все поля'];
-        } else {
-            $name = $request->input('name');
-            $email = $request->input('email');
-            $password = $request->input('password');
-            $age = $request->input('age');
-            $sex = $request->input('sex');
-            $city = $request->input('city');
-            $hash = AppHelper::instance()->getHash($password);
-            $user = new User();
 
-            $user->name = $name;
-            $user->email = $email;
-            $user->password = $password;
-            $user->age = $age;
-            $user->sex = $sex;
-            $user->city = $city;
-            $user->hash = $hash;
-            $user->save();
-            $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован'];
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors(), 'Validation Error', 422);
         }
+        $password = $input['password'];
+
+        $input['hash'] = AppHelper::instance()->getHash($password);
+
+        $input['password'] = bcrypt($password);
+
+        $user = User::create($input);
+
+        $answer = ['status' => 'success', 'text' => 'Успешно зарегистрирован', 'user' => $user];
+
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
     public function auth(Request $request) {
-        $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
-        $user = [];
 
-        if ($login = $request->input('login') and $password = $request->input('password')) {
-            $user = User::where([
-                    ['email', $login],
-                    ['password', $password]
-                ]
-            )->get();
-            $answer = $user;
-            if ($user->count() == 0) {
-                $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
-            }
+//        $answer = ['status' => 'error', 'text' => 'Не указан логин или пароль'];
+//        $user = [];
+//
+//        if ($login = $request->input('login') and $password = $request->input('password')) {
+//            $user = User::where([
+//                    ['email', $login],
+//                    ['password', $password]
+//                ]
+//            )->get();
+//            $answer = $user;
+//            if ($user->count() == 0) {
+//                $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
+//            }
+//        }
+//        return response()->json($answer);
+
+        $input = $request->only('email', 'password');
+
+        $validator = Validator::make($input, [
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError($validator->errors(), 'Validation Error', 422);
         }
 
-        return response()->json($answer);
+        try {
+            // this authenticates the user details with the database and generates a token
+            if (! $token = JWTAuth::attempt($input)) {
+                return $this->sendError([], "invalid login credentials", 400);
+            }
+        } catch (JWTException $e) {
+            return $this->sendError([], $e->getMessage(), 500);
+        }
+
+        $success = [
+            'token' => $token,
+        ];
+        return $this->sendResponse($success, 'successful login', 200);
+
     }
 
     public function getMessagesFrom(Request $request) {
