@@ -14,7 +14,7 @@ class CreateLogReqTable extends Migration
     public function up()
     {
         Schema::create('logging_requests', function (Blueprint $table) {
-            $table->uuid('id');
+            $table->id();
             $table->string('url', 1024);
             $table->jsonb('params');
             $table->jsonb('response');
