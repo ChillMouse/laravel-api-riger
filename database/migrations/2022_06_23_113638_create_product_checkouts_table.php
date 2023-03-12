@@ -13,14 +13,7 @@ class CreateProductCheckoutsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_etmobile')->create('product_checkouts', function (Blueprint $table) {
-            $table->id();
-            $table->string('id_product');
-            $table->string('id_checkout');
-            $table->string('count');
-            $table->string('modify');
-            $table->timestamps();
-        });
+        //
     }
 
     /**

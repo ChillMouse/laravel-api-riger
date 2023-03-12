@@ -6,6 +6,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class AppHelper
 {
     public function logWrite(Request $request, Response | JsonResponse $response): void {
@@ -22,6 +24,12 @@ class AppHelper
         $logreq->response = json_encode($response);
 
         $logreq->save();
+    }
+
+    public function getIdFromJwt(): string {
+        $token = JWTAuth::getToken();
+        $apy = JWTAuth::getPayload($token)->toArray();
+        return $apy['sub'];
     }
 
     public function getHash($str) {

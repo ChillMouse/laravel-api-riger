@@ -13,14 +13,7 @@ class CreateProductsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_etmobile')->create('products', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->string('cost');
-            $table->binary('image');
-            $table->timestamps();
-        });
+        //
     }
 
     /**

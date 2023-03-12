@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateImagesTable extends Migration
+class CreateLogReqTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('logging_requests', function (Blueprint $table) {
             $table->uuid('id');
-            $table->uuid('user_id');
-            $table->string('image_path', 1024);
-            $table->integer('is_avatar')->default(0);
+            $table->string('url', 1024);
+            $table->jsonb('params');
+            $table->jsonb('response');
+            $table->jsonb('headers');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateImagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('images');
+        Schema::dropIfExists('logging_requests');
     }
 }

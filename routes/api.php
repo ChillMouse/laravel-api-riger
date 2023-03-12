@@ -23,10 +23,11 @@ Route::group(
             'auth_headers',
             'logging_requests',
         ]
-    ], function () {
-        Route::post('/register', [ApiController::class, 'register']);
-        Route::post('/auth', [ApiController::class, 'auth']);
-        Route::post('/registerToDoctor', [ApiController::class, 'registerToDoctor']);
+    ],
+    function () {
+        Route::post('/register',            [ApiController::class, 'register']);
+        Route::post('/auth',                [ApiController::class, 'auth']);
+        Route::post('/registerToDoctor',    [ApiController::class, 'registerToDoctor']);
         Route::post('/getRegisterToDoctor', [ApiController::class, 'getRegisterToDoctor']);
     });
 
@@ -36,17 +37,18 @@ Route::group(
             'jwt.verify',
             'logging_requests',
         ]
-    ], function () {
-        Route::post('/newMessage', [ApiController::class, 'newMessage']);
-        Route::get('/getMessagesFrom', [ApiController::class, 'getMessagesFrom']);
-        Route::get('/getMessagesFromTo', [ApiController::class, 'getMessagesFromTo']);
-        Route::get('/getUsersByParams', [ApiController::class, 'getUsersByParams']);
-        Route::get('/getUserById', [ApiController::class, 'getUserById']);
-        Route::post('/uploadImage', [ApiController::class, 'uploadImage']);
-        Route::get('/getActualDialogues', [ApiController::class, 'getActualDialogues']);
-        Route::get('/getDialogBetween', [ApiController::class, 'getDialogBetween']);
-        Route::post('/updateProfile', [ApiController::class, 'updateProfile']);
-        Route::get('/getUsersByPage', [ApiController::class, 'getUsersByPage']);
-        Route::post('/storeImage', [ApiController::class, 'storeImage']);
+    ],
+    function () {
+        Route::get('/getMessagesFrom',     [ApiController::class, 'getMessagesFrom']);
+        Route::get('/getMessagesFromTo',   [ApiController::class, 'getMessagesFromTo']);
+        Route::get('/getUsersByParams',    [ApiController::class, 'getUsersByParams']);
+        Route::get('/getUserById',         [ApiController::class, 'getUserById']);
+        Route::get('/getDialogBetween',    [ApiController::class, 'getDialogBetween']);
+        Route::get('/getActualDialogues',  [ApiController::class, 'getActualDialogues']);
+        Route::get('/getUsersByPage',      [ApiController::class, 'getUsersByPage']);
         Route::get('/getImagesByUserUuid', [ApiController::class, 'getImagesByUserUuid']);
+        Route::post('/newMessage',         [ApiController::class, 'newMessage']);
+        Route::post('/uploadImage',        [ApiController::class, 'uploadImage']);
+        Route::post('/updateProfile',      [ApiController::class, 'updateProfile']);
+        Route::post('/storeImage',         [ApiController::class, 'storeImage']);
 });

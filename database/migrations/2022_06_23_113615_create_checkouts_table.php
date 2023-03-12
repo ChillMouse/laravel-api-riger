@@ -13,10 +13,7 @@ class CreateCheckoutsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_etmobile')->create('checkouts', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        //
     }
 
     /**

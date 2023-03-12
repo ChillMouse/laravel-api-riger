@@ -13,12 +13,7 @@ class CreateTokensTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql_etmobile')->create('tokens', function (Blueprint $table) {
-            $table->id();
-            $table->string('token');
-            $table->integer('id_user');
-            $table->timestamps();
-        });
+        //
     }
 
     /**

@@ -31,6 +31,7 @@ class ApiController extends Controller
     public function sendResponse($data, $message, $status = 200)
     {
         $response = [
+            'status' => 'success',
             'data' => $data,
             'message' => $message
         ];
@@ -70,7 +71,7 @@ class ApiController extends Controller
 
         $input['password'] = bcrypt($password);
 
-        $user = User::create($input);
+        User::create($input);
 
         $email = $input['email'];
 
@@ -118,10 +119,7 @@ class ApiController extends Controller
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
-
-
-        // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function newMessage(Request $request) {
@@ -144,7 +142,7 @@ class ApiController extends Controller
             $answer = ['status' => 'error', 'text' => 'Не хватает параметров'];
         }
 
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);;
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);;
     }
 
     public function getUsersByParams(Request $request) {
@@ -172,48 +170,24 @@ class ApiController extends Controller
         ];
 
         $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->get();
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function updateProfile(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-        ]);
+        $id = AppHelper::instance()->getIdFromJwt();
 
-        if ($validator->fails()) {
-            $answer = $validator->errors();
-            $answer->add('status', 'error');
-            //$answer = ['status' => 'error', 'text' => 'Не заполнены все поля'];
+        if (isset($id)) {
+            $answer = [
+                'status' => 'error',
+                'reason' => 'user undefined'
+            ];
         } else {
-            $id = $request->input('id');
-
             $user = User::find($id);
             $user->fill($request->all())->save();
             $answer = ['status' => 'success', 'text' => 'Пользователь обновлён'];
         }
 
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
-    }
-
-    public function uploadImage(Request $request) {
-        if ($id_user = $request->id_user and $image = $request->image) {
-            $isAvatar = false;
-            if ($request->is_avatar) {
-                $isAvatar = $request->is_avatar;
-            }
-            $pivot = new UserImage();
-            $images = new Images();
-            $images->image = $image;
-            $images->isAvatar = $isAvatar;
-            $images->save();
-            $pivot->id_user = $id_user;
-            $pivot->id_image = $images->id;
-            $pivot->save();
-            $answer = ['status' => 'success', 'id_image' => $images->id];
-        } else {
-            $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя или не передали картинку'];
-        }
-        return $answer;
     }
 
     public function getImagesByUserUuid(Request $request) {
@@ -228,7 +202,7 @@ class ApiController extends Controller
             $answer = ['status' => 'error', 'text' => 'Вы не указали id пользователя или пользователь не найден'];
         }
 
-        return response()->json($answer);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function getActualDialogues(Request $request) {
@@ -243,7 +217,7 @@ class ApiController extends Controller
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
         }
 
-        return response()->json($answer);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function getMessagesFromTo(Request $request) {
@@ -253,24 +227,26 @@ class ApiController extends Controller
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
 
 
         // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
 
     public function getDialogBetween(Request $request) {
-        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to)) {
+        if ($id_to = $request->input('id_to') and is_numeric($id_to)) {
             $messages = new Messages();
 
-            $dialog = $messages->orWhere(function ($query) use ($id_to, $id_from) {
+            $id_self = AppHelper::instance()->getIdFromJwt();
+
+            $dialog = $messages->orWhere(function ($query) use ($id_to, $id_self) {
                 $query->where([
-                ['id_from_user', '=', $id_from],
+                ['id_from_user', '=', $id_self],
                 ['id_to_user', '=', $id_to]
                 ]);
-            })->orWhere(function($query) use ($id_to, $id_from) {
+            })->orWhere(function($query) use ($id_to, $id_self) {
                 $query->where([
-                    ['id_to_user', '=', $id_from],
+                    ['id_to_user', '=', $id_self],
                     ['id_from_user', '=', $id_to]
                 ]);
             })->get()->sortBy('created_at');
@@ -279,7 +255,7 @@ class ApiController extends Controller
         } else {
             $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
         }
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     public function registerToDoctor(Request $request) {
@@ -356,9 +332,7 @@ class ApiController extends Controller
             $count = intval($count);
             $page = intval($page);
 
-            $token = JWTAuth::getToken();
-            $apy = JWTAuth::getPayload($token)->toArray();
-            $id = $apy['sub'];
+            $id = AppHelper::instance()->getIdFromJwt();
 
             $users = User::skip($count * $page)->take($count)->where('id', '!=', $id)->get();
 
@@ -410,9 +384,7 @@ class ApiController extends Controller
         }
 
         if (!$validator->fails()) {
-            $token = JWTAuth::getToken();
-            $apy = JWTAuth::getPayload($token)->toArray();
-            $id = $apy['sub'];
+            $id = AppHelper::instance()->getIdFromJwt();
             $destination_path = 'public/images/avatars';
             $image = $request->file('image');
             $image_name = uniqid('img_');

@@ -13,12 +13,7 @@ class CreateUserImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_images', function (Blueprint $table) {
-            $table->id();
-            $table->integer('id_user');
-            $table->integer('id_image');
-            $table->timestamps();
-        });
+        Schema::dropIfExists('user_images');
     }
 
     /**
