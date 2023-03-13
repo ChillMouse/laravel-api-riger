@@ -349,20 +349,14 @@ class ApiController extends Controller
     }
 
     public function getUserById(Request $request) {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|uuid',
-        ]);
+        $id = AppHelper::instance()->getIdFromJwt();
 
-        if ($validator->fails()) {
-            $answer = $validator->errors();
-            $answer->add('status', 'error');
+        if (!isset($id)) {
+            $answer = ['result' => 'error'];
         } else {
-            $id_user = $request->input('id');
-
             $user = ['Пустой массив'];
 
-            $id_user = intval($id_user);
-            $user = User::find($id_user)->getImages();
+            $user = User::find($id);
 
             $answer = ['status' => 'success', 'text' => 'Успешно', 'result' => $user];
 
