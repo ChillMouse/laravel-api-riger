@@ -77,8 +77,12 @@ class ApiController extends Controller
 
         $token = JWTAuth::attempt(['email' => $email, 'password' => $password]);
 
+        $user = JWTAuth::setToken($token)->toUser();
+        $user->load('images');
+
         $success = [
             'token' => $token,
+            'user'  => $user
         ];
 
         return $this->sendResponse($success, 'successful registration', 200);
@@ -105,9 +109,14 @@ class ApiController extends Controller
             return $this->sendError([], $e->getMessage(), 500);
         }
 
+        $user = JWTAuth::setToken($token)->toUser();
+        $user->load('images');
+
         $success = [
             'token' => $token,
+            'user'  => $user
         ];
+
         return $this->sendResponse($success, 'successful login', 200);
 
     }
@@ -349,14 +358,20 @@ class ApiController extends Controller
     }
 
     public function getUserById(Request $request) {
-        $id = AppHelper::instance()->getIdFromJwt();
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|uuid',
+        ]);
 
-        if (!isset($id)) {
-            $answer = ['result' => 'error'];
+        if ($validator->fails()) {
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
         } else {
+            $id_user = $request->input('id');
+
             $user = ['Пустой массив'];
 
-            $user = User::find($id);
+            $user = User::find($id_user);
+            $user->load('images');
 
             $answer = ['status' => 'success', 'text' => 'Успешно', 'result' => $user];
 
@@ -403,4 +418,5 @@ class ApiController extends Controller
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
     }
+
 }
