@@ -243,7 +243,7 @@ class ApiController extends Controller
     }
 
     public function getDialogBetween(Request $request) {
-        if ($id_to = $request->input('id_to') and is_numeric($id_to)) {
+        if ($id_to = $request->input('id_to')) {
             $messages = new Messages();
 
             $id_self = AppHelper::instance()->getIdFromJwt();
@@ -262,7 +262,7 @@ class ApiController extends Controller
 
             $answer = $dialog;
         } else {
-            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
