@@ -126,7 +126,7 @@ class ApiController extends Controller
         if ($id = $request->input('id') and is_numeric($id) and $user = User::find($id)) {
             $answer = $user->getMessagesFrom;
         } else {
-            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+            $answer = ['status' => 'error', 'text' => 'Пользователь не найден'];
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
@@ -216,7 +216,7 @@ class ApiController extends Controller
 
     public function getActualDialogues(Request $request) {
         $success = true;
-        if ($id = $request->id and $user = User::find($id)) {
+        if ($id = AppHelper::instance()->getIdFromJwt() and $user = User::find($id)) {
             $answer = $user->getDialogues->sortByDesc('created_at')->values()->unique('id_from_user');
         } else {
             $success = false;
@@ -229,18 +229,24 @@ class ApiController extends Controller
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getMessagesFromTo(Request $request) {
-        // Получить сообщения отправленные автору
-        if ($id_from = $request->input('id_from') and is_numeric($id_from) and $id_to = $request->input('id_to') and is_numeric($id_to) and $user = User::find($id_from)) {
-            $answer = $user->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
-        } else {
-            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
-        }
-        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
-
-
-        // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
-    }
+//    public function getMessagesFromTo(Request $request) {
+//        // Получить сообщения отправленные автору
+//        if (
+//            $id_from = $request->input('id_from')
+//            and is_numeric($id_from)
+//            and $id_to = $request->input('id_to')
+//            and is_numeric($id_to)
+//            and $user = User::find($id_from)
+//        ) {
+//            $answer = $user->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
+//        } else {
+//            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
+//        }
+//        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
+//
+//
+//        // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
+//    }
 
     public function getDialogBetween(Request $request) {
         if ($id_to = $request->input('id_to')) {
