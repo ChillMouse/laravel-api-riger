@@ -135,7 +135,7 @@ class ApiController extends Controller
         if (
             $idToUser = $request->input('id_to_user')
                 and
-            $idFromUser = $request->input('id_from_user')
+            $idFromUser = AppHelper::instance()->getIdFromJwt()
                 and
             $text = $request->input('text')
         ) {
