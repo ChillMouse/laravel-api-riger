@@ -214,7 +214,7 @@ class ApiController extends Controller
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getActualDialogues(Request $request) {
+    public function getActualDialogues() {
         $success = true;
         if ($id = AppHelper::instance()->getIdFromJwt() and $user = User::find($id)) {
             $answer = $user->getDialogues->sortByDesc('created_at')->values()->unique('id_from_user');
