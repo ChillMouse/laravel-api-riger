@@ -165,7 +165,7 @@ class ApiController extends Controller
         $count = 15;
 
         $validator = Validator::make($request->all(), [
-            'page' => 'integer|nullable',
+            'page' => 'integer',
             'sex' => 'string|nullable',
             'city' => 'string|nullable',
             'ageStart' => 'integer|nullable',
