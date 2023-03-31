@@ -8,6 +8,7 @@ use App\Models\Images;
 use App\Models\Messages;
 use App\Models\User;
 use App\Models\UserImage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -154,31 +155,43 @@ class ApiController extends Controller
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);;
     }
 
-    public function getUsersByParams(Request $request) {
-        $sex = "%";
-        $city = "%";
-        $ageStart = 0;
-        $ageEnd = 100;
+    public function getUsersByParams(Request $request): JsonResponse {
+        $input = [];
+        $input['sex'] = "%";
+        $input['city'] = "%";
+        $input['ageStart'] = 0;
+        $input['ageEnd'] = 100;
+        $input['page'] = 1;
+        $count = 15;
 
-        if ($val = $request->input('sex'))
-            $sex = $val;
+        $validator = Validator::make($request->all(), [
+            'page' => 'integer|nullable',
+            'sex' => 'string|nullable',
+            'city' => 'string|nullable',
+            'ageStart' => 'integer|nullable',
+            'ageEnd' => 'integer|nullable',
+        ]);
 
-        if ($val = $request->input('ageEnd'))
-            $ageEnd = $val;
+        if ($validator->fails()) {
 
-        if ($val = $request->input('ageStart'))
-            $ageStart = $val;
+            $answer = $validator->errors();
+            $answer->add('status', 'error');
 
-        if ($val = $request->input('city'))
-            $city = $val;
+        } else {
+            // без ошибок
+            $input = array_merge($input, $request->all());
 
+            $conditions = [
+                ['sex', 'like', $input['sex']],
+                ['city', 'like', $input['city']]
+            ];
 
-        $conditions = [
-            ['sex', 'like', $sex],
-            ['city', 'like', $city]
-        ];
+            $ageStart = $input['ageStart'];
+            $ageEnd = $input['ageEnd'];
+            $page = $input['page'] - 1;
 
-        $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->get();
+            $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->skip($count * $page)->take($count)->get();
+        }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
