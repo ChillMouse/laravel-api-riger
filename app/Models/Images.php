@@ -13,5 +13,6 @@ class Images extends Model
     protected $fillable = [
         'image_path',
         'user_id',
+        'is_avatar'
     ];
 }

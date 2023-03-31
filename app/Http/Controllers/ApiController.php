@@ -401,6 +401,7 @@ class ApiController extends Controller
         if (!$validator->fails()) {
             $id = AppHelper::instance()->getIdFromJwt();
             $destination_path = 'public/images/avatars';
+            $is_avatar = $request->input('is_avatar');
             $image = $request->file('image');
             $image_name = uniqid('img_');
             $ext = $image->extension();
@@ -413,7 +414,7 @@ class ApiController extends Controller
 
                 $fullpath = "$http_address" . "storage/images/avatars/$image_name.$ext";
 
-                $image->fill(['image_path' => "$fullpath", 'user_id' => $id])->save();
+                $image->fill(['image_path' => "$fullpath", 'user_id' => $id, 'is_avatart' => $is_avatar])->save();
 
             } else {
                 $answer = ['status' => 'error', 'text' => "Расширение не файла картинки"];
