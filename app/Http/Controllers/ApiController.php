@@ -181,6 +181,12 @@ class ApiController extends Controller
             // без ошибок
             $input = array_merge($input, $request->all());
 
+            foreach ($input as $key => $value) {
+                if ($value == '') {
+                    $input[$key] = '%';
+                }
+            }
+
             $conditions = [
                 ['sex', 'like', $input['sex']],
                 ['city', 'like', $input['city']]
