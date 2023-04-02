@@ -196,7 +196,7 @@ class ApiController extends Controller
             $ageEnd = $input['ageEnd'];
             $page = $input['page'] - 1;
 
-            $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->skip($count * $page)->take($count)->get();
+            $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->skip($count * $page)->take($count)->get()->load('images');
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
