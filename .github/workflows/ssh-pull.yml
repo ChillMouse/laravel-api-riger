@@ -1,0 +1,18 @@
+name: Remote Pull Execute
+run-name: Remote Pull Execute by ${{ github.actor }} 🚀
+on: [push]
+jobs:
+  build:
+    name: Git Pull
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/c/cb45884/projects/laravel-api-riger
+            git pull
