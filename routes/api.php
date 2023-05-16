@@ -40,7 +40,6 @@ Route::group(
     ],
     function () {
         Route::get('/getMessagesFrom',     [ApiController::class, 'getMessagesFrom']);
-//        Route::get('/getMessagesFromTo',   [ApiController::class, 'getMessagesFromTo']);
         Route::get('/getUsersByParams',    [ApiController::class, 'getUsersByParams']);
         Route::get('/getUserById',         [ApiController::class, 'getUserById']);
         Route::get('/getDialogBetween',    [ApiController::class, 'getDialogBetween']);

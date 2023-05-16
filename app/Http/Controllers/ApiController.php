@@ -165,7 +165,7 @@ class ApiController extends Controller
         $count = 15;
 
         $validator = Validator::make($request->all(), [
-            'page' => 'integer',
+            'page' => 'integer|nullable',
             'sex' => 'string|nullable',
             'city' => 'string|nullable',
             'ageStart' => 'integer|nullable',
@@ -188,21 +188,21 @@ class ApiController extends Controller
             }
 
             $conditions = [
-                ['sex', 'like', $input['sex']],
-                ['city', 'like', '%'.$input['city'].'%'],
+                ['sex',  'like', (int) $input['sex']],
+                ['city', 'like', '%' . $input['city'] . '%'],
             ];
 
             $ageStart = $input['ageStart'];
-            $ageEnd = $input['ageEnd'];
-            $page = $input['page'];
+            $ageEnd   = $input['ageEnd'];
+            $page     = $input['page'];
 
             $query = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd]);
 
             $answer = array();
 
-            $answer['found'] = $query->count();
+            $answer['found']   = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->count();
             $answer['maximum'] = $count;
-            $answer['users'] = $query->paginate($count, ['*'], 'page', $page)->load('images');
+            $answer['users']   = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->paginate($count, ['*'], 'page', $page)->load('images');
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
@@ -253,25 +253,6 @@ class ApiController extends Controller
 
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
-
-//    public function getMessagesFromTo(Request $request) {
-//        // Получить сообщения отправленные автору
-//        if (
-//            $id_from = $request->input('id_from')
-//            and is_numeric($id_from)
-//            and $id_to = $request->input('id_to')
-//            and is_numeric($id_to)
-//            and $user = User::find($id_from)
-//        ) {
-//            $answer = $user->getMessagesFrom->reverse()->values()->where('id_to_user', '=', $id_to);
-//        } else {
-//            $answer = ['status' => 'error', 'text' => 'Пользователь не найден или передано не число'];
-//        }
-//        return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
-//
-//
-//        // Получить сообщения автора return response()->json(User::first()->getMessagesFrom, '200', ['Content-type'=>'application/json;charset=utf-8'],JSON_UNESCAPED_UNICODE);
-//    }
 
     public function getDialogBetween(Request $request) {
         if ($id_to = $request->input('id_to')) {
