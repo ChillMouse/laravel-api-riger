@@ -203,6 +203,7 @@ class ApiController extends Controller
             $answer['found']   = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->count();
             $answer['maximum'] = $count;
             $answer['users']   = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->paginate($count, ['*'], 'page', $page)->load('images');
+            $answer['above'] = $input;
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
