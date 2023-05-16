@@ -192,8 +192,8 @@ class ApiController extends Controller
                 ['city', 'like', '%' . $input['city'] . '%'],
             ];
 
-            $ageStart = $input['ageStart'];
-            $ageEnd   = $input['ageEnd'];
+            $ageStart = (int) $input['ageStart'];
+            $ageEnd   = (int) $input['ageEnd'];
             $page     = $input['page'];
 
             $query = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd]);
