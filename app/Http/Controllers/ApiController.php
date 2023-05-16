@@ -188,7 +188,7 @@ class ApiController extends Controller
             }
 
             $conditions = [
-                ['sex',  'like', (int) $input['sex']],
+                ['sex',  'like', $input['sex']],
                 ['city', 'like', '%' . $input['city'] . '%'],
             ];
 
