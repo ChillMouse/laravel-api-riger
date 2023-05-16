@@ -189,14 +189,20 @@ class ApiController extends Controller
 
             $conditions = [
                 ['sex', 'like', $input['sex']],
-                ['city', 'like', $input['city']]
+                ['city', 'like', $input['city']],
             ];
 
             $ageStart = $input['ageStart'];
             $ageEnd = $input['ageEnd'];
-            $page = $input['page'] - 1;
+            $page = $input['page'];
 
-            $answer = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd])->skip($count * $page)->take($count)->get()->load('images');
+            $query = User::where($conditions)->whereBetween('age', [$ageStart, $ageEnd]);
+
+            $answer = array();
+
+            $answer['found'] = $query->count();
+            $answer['maximum'] = $count;
+            $answer['users'] = $query->paginate($count, ['*'], 'page', $page)->load('images');
         }
         return response()->json($answer, '200', ['Content-type'=>'application/json;charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
