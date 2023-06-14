@@ -421,7 +421,7 @@ class ApiController extends Controller
 
                 $fullpath = "$http_address" . "storage/images/avatars/$image_name.$ext";
 
-                $image->fill(['image_path' => "$fullpath", 'user_id' => $id, 'is_avatart' => $is_avatar])->save();
+                $image->fill(['image_path' => "$fullpath", 'user_id' => $id, 'is_avatar' => $is_avatar])->save();
 
             } else {
                 $answer = ['status' => 'error', 'text' => "Расширение не файла картинки"];
